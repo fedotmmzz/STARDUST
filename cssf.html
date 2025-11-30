@@ -1,0 +1,390 @@
+ <!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>STARDUST | Celestial Coffee</title>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,400&family=Montserrat:wght@200;300;400;500&display=swap" rel="stylesheet">
+
+    <style>
+        /* --- 1. SETTINGS & RESET --- */
+        :root {
+            --bg-color: #0F0F0F;
+            --text-main: #EAEAEA;
+            --text-muted: #888888;
+            --accent: #D4AF37; /* Metallic Gold */
+            --font-display: 'Cormorant Garamond', serif;
+            --font-body: 'Montserrat', sans-serif;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            cursor: none; /* Custom cursor only */
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            font-family: var(--font-body);
+            overflow-x: hidden;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        /* --- 2. GLOBAL EFFECTS --- */
+        
+        /* Cinematic Grain */
+        .grain {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 9999; opacity: 0.05;
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='1'/%3E%3C/svg%3E");
+        }
+
+        /* Custom Cursor */
+        .cursor-dot, .cursor-outline {
+            position: fixed; transform: translate(-50%, -50%); border-radius: 50%; pointer-events: none; z-index: 10000;
+        }
+        .cursor-dot { width: 5px; height: 5px; background-color: var(--accent); }
+        .cursor-outline { width: 40px; height: 40px; border: 1px solid rgba(255, 255, 255, 0.3); transition: 0.1s; }
+        
+        body:hover .cursor-outline.hovered {
+            width: 80px; height: 80px; background-color: rgba(212, 175, 55, 0.05); border-color: var(--accent); backdrop-filter: blur(2px);
+        }
+
+        /* Utility */
+        .container { max-width: 1300px; margin: 0 auto; padding: 0 5%; }
+        .gold { color: var(--accent); }
+        .display-text { font-family: var(--font-display); font-size: clamp(3rem, 6vw, 6rem); line-height: 1; }
+        
+        /* --- 3. NAVIGATION --- */
+        nav {
+            display: flex; justify-content: space-between; align-items: center; padding: 2rem 5%;
+            position: absolute; top: 0; width: 100%; z-index: 100;
+        }
+        .logo svg { width: 60px; height: 60px; fill: none; stroke: var(--text-main); stroke-width: 1.5; }
+        .logo:hover svg { stroke: var(--accent); }
+
+        /* --- 4. HERO SECTION --- */
+        .hero {
+            height: 100vh; display: flex; align-items: center; position: relative; overflow: hidden;
+        }
+        .hero-bg {
+            position: absolute; top: 0; right: 0; width: 60%; height: 100%;
+            background: url('https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?ixlib=rb-1.2.1&auto=format&fit=crop&w=1950&q=80') center/cover;
+            opacity: 0.5; mask-image: linear-gradient(to right, transparent, black 40%);
+        }
+        .hero-content { position: relative; z-index: 2; padding-left: 5%; }
+        
+        /* Animation */
+        .reveal-text span {
+            display: block; transform: translateY(100%); animation: textUp 1s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
+        .hero h1 span:nth-child(1) { animation-delay: 0.2s; }
+        .hero h1 span:nth-child(2) { animation-delay: 0.4s; color: var(--accent); font-style: italic; }
+        @keyframes textUp { to { transform: translateY(0); } }
+
+        /* --- 5. MARQUEE --- */
+        .marquee {
+            padding: 1.5rem 0; background: var(--accent); color: #000; overflow: hidden; white-space: nowrap; display: flex;
+        }
+        .marquee-content { display: inline-flex; animation: scroll 25s linear infinite; }
+        .marquee h2 { font-family: var(--font-body); font-size: 1.2rem; margin: 0 2rem; font-weight: 500; letter-spacing: 2px; text-transform: uppercase;}
+        @keyframes scroll { from { transform: translateX(0); } to { transform: translateX(-100%); } }
+
+        /* --- 6. INFO SECTION (NEW) --- */
+        .info-section {
+            padding: 10rem 0;
+            position: relative;
+        }
+        
+        .info-grid {
+            display: grid; grid-template-columns: 1fr 1fr; gap: 5rem; align-items: center;
+        }
+
+        .info-text h3 { font-family: var(--font-display); font-size: 3rem; margin-bottom: 2rem; }
+        .info-text p { color: var(--text-muted); line-height: 1.8; margin-bottom: 2rem; font-size: 1.1rem; }
+        
+        .info-stats {
+            display: flex; gap: 3rem; border-top: 1px solid #333; padding-top: 2rem;
+        }
+        .stat-item h4 { color: var(--accent); font-size: 0.8rem; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 0.5rem; }
+        .stat-item p { font-size: 1.2rem; font-family: var(--font-display); }
+
+        .info-image {
+            height: 600px; width: 100%; position: relative; overflow: hidden;
+        }
+        .info-image img {
+            width: 100%; height: 120%; object-fit: cover; position: absolute; top: -10%; transition: transform 0.1s;
+        }
+
+        /* --- 7. EXTENDED MENU SECTION --- */
+        .menu-section { padding: 5rem 0 10rem; background: #111; }
+        .section-header { text-align: center; margin-bottom: 6rem; }
+
+        /* Masonry-like Grid */
+        .menu-grid {
+            display: grid; grid-template-columns: repeat(3, 1fr); gap: 3rem;
+        }
+
+        .menu-card { margin-bottom: 4rem; transition: transform 0.4s; }
+        
+        /* The "Broken" Layout Logic - Offsetting columns */
+        .menu-grid .menu-card:nth-child(3n+2) { margin-top: 6rem; } /* Shift middle column down */
+        .menu-grid .menu-card:nth-child(3n+3) { margin-top: 3rem; } /* Shift right column slightly */
+
+        .image-wrapper {
+            height: 380px; overflow: hidden; margin-bottom: 1.5rem; position: relative;
+        }
+        .image-wrapper img {
+            width: 100%; height: 100%; object-fit: cover; transition: transform 1.2s cubic-bezier(0.19, 1, 0.22, 1);
+        }
+        .menu-card:hover .image-wrapper img { transform: scale(1.1); }
+
+        .card-info {
+            display: flex; justify-content: space-between; align-items: baseline; 
+            border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 0.8rem;
+        }
+        .card-info h3 { font-family: var(--font-display); font-size: 1.8rem; font-weight: 400; }
+        .price { color: var(--accent); font-size: 1.1rem; }
+        .desc { color: var(--text-muted); font-size: 0.9rem; margin-top: 0.8rem; line-height: 1.5; }
+        .category-tag {
+            font-size: 0.7rem; text-transform: uppercase; letter-spacing: 2px; color: #555; margin-bottom: 0.5rem; display: block;
+        }
+
+        /* --- 8. FOOTER --- */
+        footer {
+            padding: 5rem 5%; border-top: 1px solid #222; text-align: center; color: var(--text-muted);
+        }
+
+        /* Responsive */
+        @media (max-width: 900px) {
+            .hero-bg { width: 100%; opacity: 0.3; }
+            .info-grid { grid-template-columns: 1fr; }
+            .menu-grid { grid-template-columns: 1fr; }
+            .menu-grid .menu-card:nth-child(n) { margin-top: 0; } /* Reset offsets on mobile */
+        }
+    </style>
+</head>
+<body>
+
+    <div class="grain"></div>
+    <div class="cursor-dot" id="cursor-dot"></div>
+    <div class="cursor-outline" id="cursor-outline"></div>
+
+    <nav class="hover-target">
+        <a href="#" class="logo">
+            <svg viewBox="0 0 100 100">
+                <g class="stars">
+                    <path d="M50 10 L52 15 L57 15 L53 19 L55 24 L50 21 L45 24 L47 19 L43 15 L48 15 Z" fill="#D4AF37">
+                        <animate attributeName="opacity" values="0;1;0" dur="2s" repeatCount="indefinite"/>
+                        <animateTransform attributeName="transform" type="translate" values="0 0; 0 30" dur="2s" repeatCount="indefinite"/>
+                    </path>
+                    <path d="M30 5 L31 8 L34 8 L32 10 L33 13 L30 11 L27 13 L28 10 L26 8 L29 8 Z" fill="#D4AF37" opacity="0.6">
+                         <animate attributeName="opacity" values="0;1;0" dur="3s" repeatCount="indefinite" begin="1s"/>
+                         <animateTransform attributeName="transform" type="translate" values="0 0; 0 25" dur="3s" repeatCount="indefinite" begin="1s"/>
+                    </path>
+                </g>
+                <path d="M25 55 C25 80 75 80 75 55 L75 40 L25 40 Z" stroke="inherit" fill="none"/>
+                <path d="M75 45 C85 45 85 55 75 55" stroke="inherit" fill="none"/>
+            </svg>
+        </a>
+        <div style="text-transform: uppercase; letter-spacing: 2px; font-size: 0.8rem;">Italy • Est. 2025</div>
+    </nav>
+
+    <header class="hero">
+        <div class="hero-content">
+            <h1 class="display-text reveal-text">
+                <span>The Art of</span>
+                <span>Silence.</span>
+            </h1>
+        </div>
+        <div class="hero-bg parallax" data-speed="0.5"></div>
+    </header>
+
+    <div class="marquee">
+        <div class="marquee-content">
+            <h2>Specialty Coffee • Fresh Pastry • Japanese Tea • </h2>
+            <h2>Specialty Coffee • Fresh Pastry • Japanese Tea • </h2>
+            <h2>Specialty Coffee • Fresh Pastry • Japanese Tea • </h2>
+            <h2>Specialty Coffee • Fresh Pastry • Japanese Tea • </h2>
+        </div>
+    </div>
+
+    <section class="info-section">
+        <div class="container">
+            <div class="info-grid">
+                <div class="info-image hover-target">
+                    <img src="b4f03f72-0b92-4e01-8af0-0b91fcef3104.png" alt="Barista working" class="parallax-img" data-speed="0.1">
+                </div>
+                <div class="info-text">
+                    <span class="gold" style="letter-spacing: 2px; text-transform: uppercase; font-size: 0.9rem;">Behind the Bar</span>
+                    <h3>Perfection in Process</h3>
+                    <p>We believe that coffee is more than just caffeine. It is a ritual. Our beans are sourced directly from small-lot farmers in the highlands of <strong>Ethiopia and Colombia</strong>, ensuring fair trade and exceptional flavor profiles.</p>
+                    <p>Every cup is extracted on our custom <strong>La Marzocco GB5</strong>, calibrated daily to highlight the unique acidity and sweetness of the roast.</p>
+                    
+                    <div class="info-stats">
+                        <div class="stat-item">
+                            <h4>Head Barista</h4>
+                            <p>Julian V.</p>
+                        </div>
+                        <div class="stat-item">
+                            <h4>Roast Level</h4>
+                            <p>Omni-Light</p>
+                        </div>
+                        <div class="stat-item">
+                            <h4>Water</h4>
+                            <p>Remineralized</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="menu-section">
+        <div class="container">
+            <div class="section-header">
+                <p class="gold" style="letter-spacing: 3px;">MENU</p>
+                <h2 class="display-text" style="font-size: 4rem;">Curated Selection</h2>
+            </div>
+            
+            <div class="menu-grid">
+                
+                <div class="menu-card hover-target">
+                    <span class="category-tag">Coffee</span>
+                    <div class="image-wrapper">
+                        <img src="https://th.bing.com/th/id/R.daac787bd4b7c60e9e9607db99d5c559?rik=IpEbJKG8HIqlNw&pid=ImgRaw&r=0" alt="Espresso">
+                    </div>
+                    <div class="card-info">
+                        <h3>Double Espresso</h3>
+                        <span class="price">€3.50</span>
+                    </div>
+                    <div class="desc">Syrupy body, notes of dark chocolate and berries. Ethiopia Yirgacheffe.</div>
+                </div>
+
+                <div class="menu-card hover-target">
+                    <span class="category-tag">Coffee</span>
+                    <div class="image-wrapper">
+                        <img src="https://images.unsplash.com/photo-1572442388796-11668a67e53d?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80" alt="Latte">
+                    </div>
+                    <div class="card-info">
+                        <h3>Silk Latte</h3>
+                        <span class="price">€4.50</span>
+                    </div>
+                    <div class="desc">Double ristretto with perfectly textured microfoam. Plant milk available.</div>
+                </div>
+
+                <div class="menu-card hover-target">
+                    <span class="category-tag">Tea</span>
+                    <div class="image-wrapper">
+                        <img src="https://assets.kompasiana.com/items/album/2018/02/21/3175-10-amazing-health-benefits-of-bancha-twig-tea-ss-5a8d6efabde5757c676ec542.jpg?t=o&v=770" alt="V60">
+                    </div>
+                    <div class="card-info">
+                        <h3>Matcha</h3>
+                        <span class="price">€6.00</span>
+                    </div>
+                    <div class="desc">Matcha is a traditional Japanese green tea, finely ground and vibrant in flavor. It delivers calm energy, rich aroma, and a smooth, earthy taste.</div>
+                </div>
+
+                <div class="menu-card hover-target">
+                    <span class="category-tag">Tea</span>
+                    <div class="image-wrapper">
+                        <img src="https://img.freepik.com/fotos-premium/uma-xicara-de-cha-com-vapor-saindo-dela-ia-generativa_797840-4585.jpg" alt="Matcha">
+                    </div>
+                    <div class="card-info">
+                        <h3>Black tea</h3>
+                        <span class="price">€5.50</span>
+                    </div>
+                    <div class="desc">Black tea offers a bold, comforting flavor with warm aroma and steady energy - simple, classic, and perfectly timeless.</div>
+                </div>
+
+                <div class="menu-card hover-target">
+                    <span class="category-tag">Bakery</span>
+                    <div class="image-wrapper">
+                        <img src="https://images.unsplash.com/photo-1555507036-ab1f4038808a?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80" alt="Croissant">
+                    </div>
+                    <div class="card-info">
+                        <h3>Butter Croissant</h3>
+                        <span class="price">€5.50</span>
+                    </div>
+                    <div class="desc">French butter, 27 layers, baked fresh every morning at 7 AM.</div>
+                </div>
+
+                 <div class="menu-card hover-target">
+                    <span class="category-tag">Bakery</span>
+                    <div class="image-wrapper">
+                        <img src="https://tse1.explicit.bing.net/th/id/OIP.rpojXLG-Dyy-N_zBfru2FQHaJQ?rs=1&pid=ImgDetMain&o=7&rm=3" alt="Bun">
+                    </div>
+                    <div class="card-info">
+                        <h3>Cardamom Bun</h3>
+                        <span class="price">€7.00</span>
+                    </div>
+                    <div class="desc">Swedish style knot with coarse sugar and aromatic cardamom.</div>
+                </div>
+
+            </div>
+        </div>
+    </section>
+
+    <footer>
+        <div class="logo" style="margin-bottom: 2rem;">
+            <svg viewBox="0 0 100 100" style="width: 40px; height: 40px; stroke: #666;">
+                 <path d="M15 35 Q15 50 30 50 Q45 50 45 35 L45 25 L15 25 Z" fill="none" stroke-width="1.5"/>
+            </svg>
+        </div>
+        <p>© 2025 STARDUST. Minimal Intervention. Maximum Taste.</p>
+        <br>
+        <p style="font-size: 0.8rem; opacity: 0.5;">Via del Sole 18, Porto Sereno, Italia</p>
+    </footer>
+
+    <script>
+        // --- SENIOR LEVEL INTERACTIVITY (Reverted to V2 Logic) ---
+
+        // 1. Custom Cursor
+        const cursorDot = document.getElementById("cursor-dot");
+        const cursorOutline = document.getElementById("cursor-outline");
+        const hoverTargets = document.querySelectorAll(".hover-target");
+
+        window.addEventListener("mousemove", (e) => {
+            const posX = e.clientX;
+            const posY = e.clientY;
+
+            cursorDot.style.left = `${posX}px`;
+            cursorDot.style.top = `${posY}px`;
+
+            cursorOutline.animate({
+                left: `${posX}px`,
+                top: `${posY}px`
+            }, { duration: 500, fill: "forwards" });
+        });
+
+        // Hover Effect
+        hoverTargets.forEach(el => {
+            el.addEventListener('mouseenter', () => { cursorOutline.classList.add('hovered'); });
+            el.addEventListener('mouseleave', () => { cursorOutline.classList.remove('hovered'); });
+        });
+
+        // 2. Parallax Logic (Updated to handle new sections)
+        window.addEventListener('scroll', () => {
+            const scrolled = window.scrollY;
+            
+            // Hero Parallax
+            const heroBg = document.querySelector('.hero-bg');
+            if(heroBg) heroBg.style.transform = `translateY(${scrolled * 0.5}px)`;
+
+            // Info Image Parallax
+            const infoImg = document.querySelector('.parallax-img');
+            if(infoImg) {
+                // Calculate position relative to viewport for smoother effect inside section
+                const rect = infoImg.parentElement.getBoundingClientRect();
+                if(rect.top < window.innerHeight && rect.bottom > 0) {
+                     infoImg.style.transform = `translateY(${(rect.top) * 0.1}px)`;
+                }
+            }
+        });
+    </script>
+</body>
+</html>
